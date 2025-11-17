@@ -16,7 +16,7 @@ import { doc, getDoc } from "firebase/firestore";
 
 
 
-import { useLoading } from "./LoadingContext.jsx";
+import { useLoading } from "../context/LoadingContext";
 
 const AuthContext = createContext();
 

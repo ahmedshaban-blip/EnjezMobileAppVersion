@@ -14,7 +14,8 @@ import {
 
 import Home from "../pages/client/Home";
 import Services from "../pages/client/Services";
-import Booking from "../pages/client/Booking";
+import MyBookings from "../pages/client/MyBooking";
+import Booking from "../pages/client/Booking";  
 import Confirmation from "../pages/client/Confirmation";
 
 const Drawer = createDrawerNavigator();
@@ -27,8 +28,10 @@ function CustomDrawerContent(props) {
   const items = [
     { label: "Home", screen: "UserHome", icon: "home-outline" },
     { label: "Services", screen: "Services", icon: "toolbox-outline" },
+    { label: "My Bookings", screen: "MyBookings", icon: "calendar-outline" },
     { label: "Booking", screen: "Booking", icon: "calendar-plus" },
     { label: "Confirmation", screen: "Confirmation", icon: "check-circle" },
+    
   ];
 
   const handleLogout = () => {
@@ -98,6 +101,7 @@ export default function UserDrawer() {
     >
       <Drawer.Screen name="UserHome" component={Home} />
       <Drawer.Screen name="Services" component={Services} />
+      <Drawer.Screen name="MyBookings" component={MyBookings} />
       <Drawer.Screen name="Booking" component={Booking} />
       <Drawer.Screen name="Confirmation" component={Confirmation} />
     </Drawer.Navigator>

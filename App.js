@@ -10,24 +10,42 @@ import Signup from "./src/pages/auth/Signup";
 import AdminDashboard from "./src/pages/admin/AdminDashboard";
 import UserDrawer from "./src/navigation/UserDrawer";
 
+// Check that this path is correct for your project structure
+import BookingDetails from "./src/pages/client/BookingDetails"; 
+
+import { AuthProvider } from "./src/hooks/AuthContext";
+import { LoadingProvider } from "./src/context/LoadingContext";
+
 const Stack = createNativeStackNavigator();
+
+function RootNavigator() {
+  return (
+    <Stack.Navigator
+      initialRouteName="Login"
+      screenOptions={{ headerShown: false }}
+    >
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Signup" component={Signup} />
+      <Stack.Screen name="Home" component={UserDrawer} />
+      <Stack.Screen name="Admin" component={AdminDashboard} />
+      
+      {/* --- ADD THIS SCREEN --- */}
+      <Stack.Screen name="BookingDetails" component={BookingDetails} />
+    </Stack.Navigator>
+  );
+}
 
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <PaperProvider>
-        <NavigationContainer>
-          <Stack.Navigator
-            initialRouteName="Login"
-            screenOptions={{ headerShown: false }}
-          >
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Signup" component={Signup} />
-            {/* ده الـ user side كله (Home + Drawer + باقي الصفحات) */}
-            <Stack.Screen name="Home" component={UserDrawer} />
-            <Stack.Screen name="Admin" component={AdminDashboard} />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <LoadingProvider>
+          <AuthProvider>
+            <NavigationContainer>
+              <RootNavigator />
+            </NavigationContainer>
+          </AuthProvider>
+        </LoadingProvider>
       </PaperProvider>
     </GestureHandlerRootView>
   );
