@@ -15,8 +15,11 @@ import {
 import Home from "../pages/client/Home";
 import Services from "../pages/client/Services";
 import MyBookings from "../pages/client/MyBooking";
-import Booking from "../pages/client/Booking";  
+import Booking from "../pages/client/Booking";
 import Confirmation from "../pages/client/Confirmation";
+
+import About from "../pages/client/About";
+import Contact from "../pages/client/Contact";
 
 const Drawer = createDrawerNavigator();
 
@@ -31,7 +34,8 @@ function CustomDrawerContent(props) {
     { label: "My Bookings", screen: "MyBookings", icon: "calendar-outline" },
     { label: "Booking", screen: "Booking", icon: "calendar-plus" },
     { label: "Confirmation", screen: "Confirmation", icon: "check-circle" },
-    
+    { label: "About", screen: "About", icon: "information-outline" },
+    { label: "Contact", screen: "Contact", icon: "email-outline" },
   ];
 
   const handleLogout = () => {
@@ -46,13 +50,12 @@ function CustomDrawerContent(props) {
 
   return (
     <DrawerContentScrollView {...props} contentContainerStyle={styles.drawer}>
-      {/* Header جوه الـ drawer */}
+      {/* Drawer Header */}
       <View style={styles.drawerHeader}>
-        <Avatar.Text
+        <Avatar.Image
           size={52}
-          label="EN"
+          source={require("../../assets/logo 2.png")}
           style={styles.avatar}
-          color={theme.colors.onPrimary}
         />
         <View style={styles.drawerHeaderText}>
           <Text style={styles.drawerTitle}>Enjez</Text>
@@ -60,7 +63,7 @@ function CustomDrawerContent(props) {
         </View>
       </View>
 
-      {/* Links */}
+      {/* Drawer Links */}
       <PaperDrawer.Section style={styles.drawerSection}>
         {items.map((item) => (
           <PaperDrawer.Item
@@ -75,11 +78,7 @@ function CustomDrawerContent(props) {
 
       {/* Logout */}
       <PaperDrawer.Section style={styles.drawerFooter}>
-        <PaperDrawer.Item
-          label="Logout"
-          icon="logout"
-          onPress={handleLogout}
-        />
+        <PaperDrawer.Item label="Logout" icon="logout" onPress={handleLogout} />
       </PaperDrawer.Section>
     </DrawerContentScrollView>
   );
@@ -104,6 +103,8 @@ export default function UserDrawer() {
       <Drawer.Screen name="MyBookings" component={MyBookings} />
       <Drawer.Screen name="Booking" component={Booking} />
       <Drawer.Screen name="Confirmation" component={Confirmation} />
+      <Drawer.Screen name="About" component={About} />
+      <Drawer.Screen name="Contact" component={Contact} />
     </Drawer.Navigator>
   );
 }
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   avatar: {
-    backgroundColor: "#0f172a", // slate-900
+    backgroundColor: "#ffffff",
   },
   drawerHeaderText: {
     flex: 1,
