@@ -17,6 +17,7 @@ import Services from "../pages/client/Services";
 import MyBookings from "../pages/client/MyBooking";
 import Booking from "../pages/client/Booking";
 import Confirmation from "../pages/client/Confirmation";
+import HowItWorks from "../pages/client/HowItWorks";
 
 import About from "../pages/client/About";
 import Contact from "../pages/client/Contact";
@@ -34,6 +35,7 @@ function CustomDrawerContent(props) {
     { label: "My Bookings", screen: "MyBookings", icon: "calendar-outline" },
     { label: "Booking", screen: "Booking", icon: "calendar-plus" },
     { label: "Confirmation", screen: "Confirmation", icon: "check-circle" },
+    { label: "How It Works", screen: "HowItWorks", icon: "information-outline" },
     { label: "About", screen: "About", icon: "information-outline" },
     { label: "Contact", screen: "Contact", icon: "email-outline" },
   ];
@@ -103,6 +105,7 @@ export default function UserDrawer() {
       <Drawer.Screen name="MyBookings" component={MyBookings} />
       <Drawer.Screen name="Booking" component={Booking} />
       <Drawer.Screen name="Confirmation" component={Confirmation} />
+      <Drawer.Screen name="HowItWorks" component={HowItWorks} />
       <Drawer.Screen name="About" component={About} />
       <Drawer.Screen name="Contact" component={Contact} />
     </Drawer.Navigator>
