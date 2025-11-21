@@ -15,8 +15,8 @@ import {
 import Home from "../pages/client/Home";
 import Services from "../pages/client/Services";
 import MyBookings from "../pages/client/MyBooking";
-import Booking from "../pages/client/Booking";
-import Confirmation from "../pages/client/Confirmation";
+// import Booking from "../pages/client/Booking";
+// import Confirmation from "../pages/client/Confirmation";
 import HowItWorks from "../pages/client/HowItWorks";
 
 import About from "../pages/client/About";
@@ -33,10 +33,10 @@ function CustomDrawerContent(props) {
     { label: "Home", screen: "UserHome", icon: "home-outline" },
     { label: "Services", screen: "Services", icon: "toolbox-outline" },
     { label: "My Bookings", screen: "MyBookings", icon: "calendar-outline" },
-    { label: "Booking", screen: "Booking", icon: "calendar-plus" },
-    { label: "Confirmation", screen: "Confirmation", icon: "check-circle" },
+    // { label: "Booking", screen: "Booking", icon: "calendar-plus" },
+    // { label: "Confirmation", screen: "Confirmation", icon: "check-circle" },
     { label: "How It Works", screen: "HowItWorks", icon: "information-outline" },
-    { label: "About", screen: "About", icon: "information-outline" },
+    { label: "About", screen: "About", icon: "account-circle-outline" },
     { label: "Contact", screen: "Contact", icon: "email-outline" },
   ];
 
@@ -103,8 +103,8 @@ export default function UserDrawer() {
       <Drawer.Screen name="UserHome" component={Home} />
       <Drawer.Screen name="Services" component={Services} />
       <Drawer.Screen name="MyBookings" component={MyBookings} />
-      <Drawer.Screen name="Booking" component={Booking} />
-      <Drawer.Screen name="Confirmation" component={Confirmation} />
+      {/* <Drawer.Screen name="Booking" component={Booking} /> */}
+      {/* <Drawer.Screen name="Confirmation" component={Confirmation} /> */}
       <Drawer.Screen name="HowItWorks" component={HowItWorks} />
       <Drawer.Screen name="About" component={About} />
       <Drawer.Screen name="Contact" component={Contact} />

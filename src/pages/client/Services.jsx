@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, FlatList, SafeAreaView, ScrollView, TouchableOpacity } from "react-native";
+import {
+  View,
+  FlatList,
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import { TextInput, Text, IconButton } from "react-native-paper";
 import { getAllDocs, getDocsByField } from "../../utils/firebaseHelpers.js";
 import { useLoading } from "../../context/LoadingContext.jsx";
@@ -77,9 +83,10 @@ export default function ServicesPage() {
   // ------------------------------------------
   const renderHeader = () => (
     <View style={{ padding: 16, paddingTop: 50 }}>
-
       {/* Top Bar */}
-      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 20 }}>
+      <View
+        style={{ flexDirection: "row", alignItems: "center", marginBottom: 20 }}
+      >
         <IconButton icon="menu" onPress={() => navigation.openDrawer()} />
         <View>
           <Text variant="headlineSmall">Enjez</Text>
@@ -96,7 +103,7 @@ export default function ServicesPage() {
         value={search}
         onChangeText={setSearch}
         placeholder="Search service..."
-        style={{ marginBottom: 15 }}
+        style={{ marginBottom: 15, backgroundColor: "#edf1f8ff" }}
       />
 
       {/* Categories Row Scroll */}
@@ -106,10 +113,11 @@ export default function ServicesPage() {
           style={{
             paddingVertical: 8,
             paddingHorizontal: 12,
-            backgroundColor: activeCategory ? "#ddd" : "#ca98e8ff",
+            backgroundColor: activeCategory ? "#ddd" : "#2563eb",
             borderRadius: 20,
             marginRight: 10,
-          }}>
+          }}
+        >
           <Text style={{ color: activeCategory ? "#000" : "#fff" }}>All</Text>
         </TouchableOpacity>
 
@@ -120,17 +128,19 @@ export default function ServicesPage() {
             style={{
               paddingVertical: 8,
               paddingHorizontal: 12,
-              backgroundColor: activeCategory === cat.id ? "#ca98e8ff" : "#ddd",
+              backgroundColor: activeCategory === cat.id ? "#2563eb" : "#ddd",
               borderRadius: 20,
               marginRight: 10,
-            }}>
-            <Text style={{ color: activeCategory === cat.id ? "#fff" : "#000" }}>
+            }}
+          >
+            <Text
+              style={{ color: activeCategory === cat.id ? "#fff" : "#000" }}
+            >
               {cat.name}
             </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
-
     </View>
   );
 
@@ -142,7 +152,9 @@ export default function ServicesPage() {
         renderItem={({ item }) => (
           <ServiceCard
             service={item}
-            onPress={() => navigation.navigate("ServiceDetails", { id: item.id })}
+            onPress={() =>
+              navigation.navigate("ServiceDetails", { id: item.id })
+            }
           />
         )}
         ListHeaderComponent={renderHeader}
