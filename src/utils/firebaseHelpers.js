@@ -141,3 +141,25 @@ export const queryDocs = async (collectionName, conditions) => {
     return [];
   }
 };
+
+
+/**
+ * Create a new booking
+ */
+export const createBooking = async (booking) => {
+  try {
+    const docRef = await addDoc(collection(db, "bookings"), {
+      ...booking,
+      adminSeen: false,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+      referenceID: "BKG-" + Math.random().toString(36).substring(2, 7).toUpperCase(),
+    });
+
+    return docRef.id;
+  } catch (error) {
+    console.error("Error creating booking:", error);
+    return null;
+  }
+};
+

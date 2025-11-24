@@ -35,7 +35,7 @@ export default function ServiceCard({ service, onPress }) {
               marginTop: 4,
             }}
           >
-            <Text variant="titleSmall" style={{ color: "#8b448bff" }}>
+            <Text variant="titleSmall" style={{ color: "#2563eb" }}>
               {service.price} EGP
             </Text>
             <Text variant="bodySmall">

@@ -1,31 +1,88 @@
-// src/pages/client/Booking.jsx
-import React, { useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ScrollView, StyleSheet, View, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import {
   Text,
   TextInput,
   Button as PaperButton,
   IconButton,
   Card,
+  Portal,
+  Modal,
+  RadioButton,
 } from "react-native-paper";
 
+import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
+
+import { getAllDocs, createBooking } from "../../utils/firebaseHelpers.js";
+import { useAuth } from "../../hooks/AuthContext.jsx";
+
 const COLORS = {
-  pageBg: "#f4f4ff",      // خلفية فاتحة زي الويب
-  cardBg: "#ffffff",      // كارت أبيض زي الفلتر في الصورة
-  border: "#e5e7eb",      // حدود خفيفة
+  pageBg: "#f4f4ff",
+  cardBg: "#ffffff",
+  border: "#e5e7eb",
   textMuted: "#6b7280",
   primaryText: "#111827",
-  primary: "#2563eb",     // أزرق زرار
+  primary: "#2563eb",
 };
 
-export default function Booking({ navigation }) {
-  const [service, setService] = useState("");
-  const [date, setDate] = useState("");
+export default function Booking({ navigation, route }) {
+  const { id: serviceId } = route.params;
+  const { user } = useAuth();
+
+  const [service, setService] = useState(null);
+  const [agents, setAgents] = useState([]);
+  const [selectedAgent, setSelectedAgent] = useState("");
+
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
 
-  const handleSubmit = () => {
-    navigation.navigate("Confirmation");
+  // --- DATE ---
+  const [openDatePicker, setOpenDatePicker] = useState(false);
+  const [date, setDate] = useState();
+
+  // --- TIME ---
+  const [openTimePicker, setOpenTimePicker] = useState(false);
+  const [time, setTime] = useState("");
+
+  useEffect(() => {
+    const loadData = async () => {
+      const services = await getAllDocs("services");
+      const selected = services.find((s) => s.id === serviceId);
+      setService(selected);
+
+      const allAgents = await getAllDocs("agents");
+      const relatedAgents = allAgents.filter((a) =>
+        selected.agents?.includes(a.id)
+      );
+      setAgents(relatedAgents);
+    };
+
+    loadData();
+  }, []);
+
+  const handleSubmit = async () => {
+    if (!date || !time || !address || !phone || !selectedAgent) {
+      alert("Please fill all required fields");
+      return;
+    }
+
+    const booking = {
+      userId: user.uid,
+      serviceId,
+      agentId: selectedAgent,
+      date: date.toDateString(),
+      time,
+      address,
+      phone,
+      notes,
+      status: "pending",
+    };
+
+    const id = await createBooking(booking);
+    navigation.navigate("Confirmation", { bookingId: id });
   };
 
   return (
@@ -33,69 +90,154 @@ export default function Booking({ navigation }) {
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
       >
-        {/* Top bar مع زرار المينيو زي باقي الصفحات */}
-        <View style={styles.topBar}>
+        {/* Header */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 15,
+          }}
+        >
           <IconButton
-            icon="menu"
-            size={24}
-            iconColor={COLORS.primaryText}
-            onPress={() => navigation.openDrawer()}
+            icon="arrow-left"
+            onPress={() => navigation.goBack()}
+            size={26}
           />
-          <View style={styles.brand}>
-            <Text style={styles.brandTitle}>Enjez</Text>
-            <Text style={styles.brandSubtitle}>
-              Book trusted home services
-            </Text>
-          </View>
+
+          <Text variant="headlineSmall">Book {service?.name} Service</Text>
         </View>
-
-        <Text style={styles.title}>New booking</Text>
-        <Text style={styles.subtitle}>
-          Choose your service and preferred time. Later you can connect this
-          form with your backend like in the web app.
-        </Text>
-
-        {/* كارت أبيض حوالين الفورم زي Filters في تصميم الويب */}
         <Card mode="elevated" style={styles.formCard}>
           <Card.Content>
+            {/* PROVIDER */}
+            <Text style={styles.label}>Provider</Text>
+            <TouchableOpacity
+              style={styles.selector}
+              onPress={() => setOpenTimePicker("provider")}
+            >
+              <Text>
+                {selectedAgent
+                  ? agents.find((a) => a.id === selectedAgent)?.name
+                  : "Select provider"}
+              </Text>
+            </TouchableOpacity>
+
+            <Portal>
+              <Modal
+                visible={openTimePicker === "provider"}
+                onDismiss={() => setOpenTimePicker("")}
+              >
+                <Card style={styles.modalCard}>
+                  <Card.Content>
+                    <Text style={styles.modalTitle}>Select Provider</Text>
+
+                    <RadioButton.Group
+                      value={selectedAgent}
+                      onValueChange={setSelectedAgent}
+                    >
+                      {agents.map((a) => (
+                        <RadioButton.Item
+                          key={a.id}
+                          label={a.name}
+                          value={a.id}
+                        />
+                      ))}
+                    </RadioButton.Group>
+
+                    <PaperButton
+                      mode="contained"
+                      style={styles.button}
+                      onPress={() => setOpenTimePicker("")}
+                    >
+                      Done
+                    </PaperButton>
+                  </Card.Content>
+                </Card>
+              </Modal>
+            </Portal>
+
+            {/* DATE */}
+            <Text style={styles.label}>Requested Date</Text>
+            <TouchableOpacity
+              style={styles.selector}
+              onPress={() => setOpenDatePicker(true)}
+            >
+              <Text>{date ? date.toDateString() : "Pick a date"}</Text>
+            </TouchableOpacity>
+
+            <DatePickerModal
+              locale="en"
+              mode="single"
+              visible={openDatePicker}
+              onDismiss={() => setOpenDatePicker(false)}
+              date={date}
+              onConfirm={(params) => {
+                setOpenDatePicker(false);
+                setDate(params.date);
+              }}
+            />
+
+            {/* TIME */}
+            <Text style={styles.label}>Requested Time</Text>
+            <TouchableOpacity
+              style={styles.selector}
+              onPress={() => setOpenTimePicker(true)}
+            >
+              <Text>{time || "Pick a time"}</Text>
+            </TouchableOpacity>
+
+            <TimePickerModal
+              visible={openTimePicker === true}
+              onDismiss={() => setOpenTimePicker(false)}
+              onConfirm={({ hours, minutes }) => {
+                setOpenTimePicker(false);
+
+                const formatted =
+                  (hours % 12 || 12) +
+                  ":" +
+                  (minutes < 10 ? "0" + minutes : minutes) +
+                  (hours >= 12 ? " PM" : " AM");
+
+                setTime(formatted);
+              }}
+            />
+
+            {/* ADDRESS */}
             <TextInput
               mode="outlined"
-              label="Service"
-              placeholder="Home cleaning, AC maintenance..."
-              value={service}
-              onChangeText={setService}
+              label="Address"
+              value={address}
+              onChangeText={setAddress}
               style={styles.input}
               outlineStyle={styles.inputOutline}
             />
+
+            {/* PHONE */}
             <TextInput
               mode="outlined"
-              label="Date & time"
-              placeholder="e.g. 21 Jun, 5:00 pm"
-              value={date}
-              onChangeText={setDate}
+              label="Phone Number"
+              keyboardType="phone-pad"
+              value={phone}
+              onChangeText={setPhone}
               style={styles.input}
               outlineStyle={styles.inputOutline}
             />
+
+            {/* NOTES */}
             <TextInput
               mode="outlined"
               label="Notes"
-              placeholder="Extra details for the provider"
               value={notes}
               onChangeText={setNotes}
-              style={styles.input}
               multiline
-              numberOfLines={3}
+              style={styles.input}
               outlineStyle={styles.inputOutline}
             />
 
             <PaperButton
               mode="contained"
-              onPress={handleSubmit}
               style={styles.button}
-              labelStyle={styles.buttonLabel}
-              contentStyle={{ paddingVertical: 6 }}
+              onPress={handleSubmit}
             >
               Confirm booking
             </PaperButton>
@@ -107,67 +249,36 @@ export default function Booking({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: COLORS.pageBg,
-  },
-  container: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: 16,
-    paddingBottom: 24,
-  },
-  topBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 4,
-    marginBottom: 12,
-  },
-  brand: {
-    marginLeft: 4,
-  },
-  brandTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: COLORS.primaryText,
-  },
-  brandSubtitle: {
-    fontSize: 13,
-    color: COLORS.textMuted,
-  },
-  title: {
-    marginTop: 4,
-    fontSize: 22,
-    fontWeight: "700",
-    color: COLORS.primaryText,
-  },
-  subtitle: {
-    marginTop: 4,
-    fontSize: 14,
-    color: COLORS.textMuted,
-    marginBottom: 16,
-  },
-  formCard: {
-    borderRadius: 24,
-    backgroundColor: COLORS.cardBg,
-    paddingVertical: 4,
-  },
-  input: {
-    marginBottom: 12,
-    backgroundColor: "#ffffff", // مفيش بقى الأزرق الغامق
-  },
-  inputOutline: {
-    borderRadius: 18,
+  safeArea: { flex: 1, backgroundColor: COLORS.pageBg },
+  container: { flex: 1 },
+  content: { paddingHorizontal: 16, paddingBottom: 24 },
+
+  topBar: { flexDirection: "row", alignItems: "center", marginBottom: 16 },
+  brandTitle: { fontSize: 20, fontWeight: "700" },
+  brandSubtitle: { fontSize: 13, color: COLORS.textMuted },
+
+  title: { fontSize: 24, fontWeight: "800", marginBottom: 12 },
+
+  formCard: { paddingBottom: 12, borderRadius: 24 },
+  label: { marginTop: 12, marginBottom: 6, fontWeight: "400" },
+
+  selector: {
+    backgroundColor: "#fff",
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1,
     borderColor: COLORS.border,
   },
+
+  input: { marginTop: 12, backgroundColor: "#fff" },
+  inputOutline: { borderRadius: 18, borderColor: COLORS.border },
+
   button: {
-    marginTop: 4,
-    borderRadius: 999,
+    marginTop: 16,
+    borderRadius: 50,
     backgroundColor: COLORS.primary,
   },
-  buttonLabel: {
-    fontWeight: "600",
-    color: "#ffffff",
-  },
+
+  modalCard: { margin: 20, padding: 10, borderRadius: 20 },
+  modalTitle: { fontSize: 18, fontWeight: "700", marginBottom: 10 },
 });

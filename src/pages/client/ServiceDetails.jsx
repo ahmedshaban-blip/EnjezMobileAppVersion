@@ -26,7 +26,10 @@ export default function ServiceDetailsPage({ route }) {
   if (!service) return null;
 
   return (
-    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingTop: 50 }}>
+    <ScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={{ padding: 16, paddingTop: 50 }}
+    >
       {/* Header */}
       <View
         style={{
@@ -105,13 +108,18 @@ export default function ServiceDetailsPage({ route }) {
         style={{
           marginTop: 30,
           paddingVertical: 6,
-          borderRadius: 10,
+          borderRadius: 12,
+          backgroundColor: "#2563eb", // blue-600
         }}
-        onPress={() => console.log("Booking...")}
+        labelStyle={{
+          fontSize: 16,
+          fontWeight: "700",
+          color: "white",
+        }}
+        onPress={() => navigation.navigate("Booking", { id })}
       >
-        Book Now
+        Book This Service
       </Button>
     </ScrollView>
   );
 }
-

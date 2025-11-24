@@ -16,6 +16,8 @@ import BookingDetails from "./src/pages/client/BookingDetails";
 import { AuthProvider } from "./src/hooks/AuthContext";
 import { LoadingProvider } from "./src/context/LoadingContext";
 import ServiceDetailsPage from "./src/pages/client/ServiceDetails";
+import Booking from "./src/pages/client/Booking";
+import Confirmation from "./src/pages/client/Confirmation";
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +35,8 @@ function RootNavigator() {
       {/* --- ADD THIS SCREEN --- */}
       <Stack.Screen name="BookingDetails" component={BookingDetails} />
       <Stack.Screen name="ServiceDetails" component={ServiceDetailsPage} />
+      <Stack.Screen name="Booking" component={Booking} />
+      <Stack.Screen name="Confirmation" component={Confirmation} />
     </Stack.Navigator>
   );
 }
