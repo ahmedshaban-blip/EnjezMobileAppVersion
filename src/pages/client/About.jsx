@@ -182,6 +182,7 @@ export default function About({ navigation }) {
               <Button
                 full={false}
                 onPress={() => navigation.navigate("Services")}
+                style={styles.btn}
               >
                 Explore Services
               </Button>
@@ -426,5 +427,9 @@ const styles = StyleSheet.create({
     gap: 12,
     flexWrap: "wrap",
     justifyContent: "center",
+    color: COLORS.primary,
   },
+  btn: {
+    backgroundColor: COLORS.primary,
+  }
 });

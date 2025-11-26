@@ -87,7 +87,7 @@ export default function Login() {
             </View>
           </View>
 
-          <Button full onPress={handleLogin}>
+          <Button full onPress={handleLogin} style={styles.btn}>
             Sign in
           </Button>
 
@@ -146,5 +146,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#ef4444",
     textAlign: "center",
+  },
+  btn: { 
+    backgroundColor: "#2563eb", 
   },
 });
