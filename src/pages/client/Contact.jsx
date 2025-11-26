@@ -169,7 +169,7 @@ export default function Contact({ navigation }) {
             </View>
 
             <View style={styles.submitWrapper}>
-              <Button full onPress={handleSubmit}>
+              <Button full onPress={handleSubmit} style={styles.btn}>
                 Send Message
               </Button>
             </View>
@@ -309,7 +309,9 @@ const styles = StyleSheet.create({
   submitWrapper: {
     marginTop: 8,
   },
-
+  btn: {
+    backgroundColor: "#135bec",
+  },
   infoColumn: {
     marginTop: 16,
   },

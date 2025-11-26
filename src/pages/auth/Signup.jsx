@@ -90,7 +90,7 @@ export default function Signup() {
                         />
                     </View>
 
-                    <Button full onPress={handleRegister}>
+                    <Button full onPress={handleRegister} style={styles.btn}>
                         Create account
                     </Button>
 
@@ -141,4 +141,7 @@ const styles = StyleSheet.create({
         color: "#ef4444",
         textAlign: "center",
     },
+    btn: { 
+    backgroundColor: "#2563eb", 
+  },
 });
