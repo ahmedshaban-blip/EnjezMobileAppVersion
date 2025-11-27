@@ -1,5 +1,4 @@
 // src/pages/client/HowItWorks.jsx
-// HowItWorks.jsx — React Native screen (React Native Paper styled)
 import React, { useEffect, useRef } from "react";
 import { View, ScrollView, StyleSheet, Animated, Dimensions, SafeAreaView, Platform, StatusBar } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -65,104 +64,104 @@ export default function HowItWorks() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Surface style={[styles.hero, { backgroundColor: theme.colors.surface }]}
-        elevation={3}
-      >
-        <View style={styles.heroTop}>
-          <Avatar.Text size={56} label="EN" style={[styles.avatar, { backgroundColor: theme.colors.primary }]} />
-          <View style={styles.heroText}>
-            <Text style={[styles.kicker, { color: theme.colors.primary }]}>THE ENJEZ JOURNEY</Text>
-            <Text style={styles.heroTitle}>How Enjez Works</Text>
+        <Surface style={[styles.hero, { backgroundColor: theme.colors.surface }]}
+          elevation={3}
+        >
+          <View style={styles.heroTop}>
+            <Avatar.Text size={56} label="EN" style={[styles.avatar, { backgroundColor: theme.colors.primary }]} />
+            <View style={styles.heroText}>
+              <Text style={[styles.kicker, { color: theme.colors.primary }]}>THE ENJEZ JOURNEY</Text>
+              <Text style={styles.heroTitle}>How Enjez Works</Text>
+            </View>
+          </View>
+
+          <Text style={styles.heroLead}>
+            Book any service in a few simple steps. Transparent, fast, and tailored
+            to your schedule.
+          </Text>
+
+          <Button
+            mode="contained"
+            onPress={() => navigation.navigate("Services")}
+            style={styles.cta}
+            contentStyle={styles.ctaContent}
+          >
+            Get Started
+          </Button>
+        </Surface>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionKicker, { color: theme.colors.primary }]}>FROM START TO SERVICE</Text>
+            <Text style={styles.sectionTitle}>Your step-by-step path</Text>
+            <Text style={styles.sectionLead}>
+              Each milestone is designed to keep you informed and confident, no
+              matter which service you choose.
+            </Text>
+          </View>
+
+          <View style={styles.stepsWrap}>
+            {steps.map((step, index) => {
+              const anim = animValues[index];
+              const translateY = anim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [18, 0],
+              });
+              const scale = anim.interpolate({ inputRange: [0, 1], outputRange: [0.98, 1] });
+              const opacity = anim;
+
+              return (
+                <Animated.View
+                  key={step.title}
+                  style={[styles.stepRow, { transform: [{ translateY }, { scale }], opacity }]}
+                >
+                  <Card style={[styles.stepCard, index === 0 && styles.firstStepCard]} elevation={3}>
+                    <Card.Content>
+                      <View style={styles.stepHeader}>
+                        <View style={styles.stepNumber}>
+                          <Text style={[styles.stepNumberText, { color: theme.colors.primary }]}>{index + 1}</Text>
+                        </View>
+                        <Text style={[styles.stepLabel, { color: theme.colors.primary }]}>Step {index + 1}</Text>
+                      </View>
+
+                      <Text style={styles.stepTitle}>{step.title}</Text>
+                      <Text style={styles.stepDesc}>{step.description}</Text>
+                    </Card.Content>
+                  </Card>
+
+                  <Card style={[styles.previewCard, { backgroundColor: theme.colors.surface }]} elevation={2}>
+                    <Card.Content style={styles.previewContent}>
+                      <Text style={[styles.previewKicker, { color: theme.colors.primary }]}>Preview</Text>
+                      <Text style={styles.previewTitle}>{step.title}</Text>
+                      <Text style={styles.previewDesc}>
+                        Visual walkthrough of the step in your dashboard.
+                      </Text>
+                    </Card.Content>
+                  </Card>
+                </Animated.View>
+              );
+            })}
           </View>
         </View>
 
-        <Text style={styles.heroLead}>
-          Book any service in a few simple steps. Transparent, fast, and tailored
-          to your schedule.
-        </Text>
-
-        <Button
-          mode="contained"
-          onPress={() => navigation.navigate("Services")}
-          style={styles.cta}
-          contentStyle={styles.ctaContent}
-        >
-          Get Started
-        </Button>
-      </Surface>
-
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionKicker, { color: theme.colors.primary }]}>FROM START TO SERVICE</Text>
-          <Text style={styles.sectionTitle}>Your step-by-step path</Text>
-          <Text style={styles.sectionLead}>
-            Each milestone is designed to keep you informed and confident, no
-            matter which service you choose.
+        <Surface style={[styles.footerCTAStrip, { backgroundColor: theme.colors.primary }]} elevation={4}>
+          <Text style={styles.footerTitle}>Ready to get started?</Text>
+          <Text style={styles.footerText}>
+            Tap into trusted professionals across every category. Book in minutes
+            and track every detail with Enjez.
           </Text>
-        </View>
 
-        <View style={styles.stepsWrap}>
-          {steps.map((step, index) => {
-            const anim = animValues[index];
-            const translateY = anim.interpolate({
-              inputRange: [0, 1],
-              outputRange: [18, 0],
-            });
-            const scale = anim.interpolate({ inputRange: [0, 1], outputRange: [0.98, 1] });
-            const opacity = anim;
+          <Button
+            mode="outlined"
+            onPress={() => navigation.navigate("Services")}
+            style={styles.ctaExplore}
+            labelStyle={styles.ctaExploreLabel}
+          >
+            Explore Services
+          </Button>
+        </Surface>
 
-            return (
-              <Animated.View
-                key={step.title}
-                style={[styles.stepRow, { transform: [{ translateY }, { scale }], opacity }]}
-              >
-                <Card style={[styles.stepCard, index === 0 && styles.firstStepCard]} elevation={3}>
-                  <Card.Content>
-                    <View style={styles.stepHeader}>
-                      <View style={styles.stepNumber}>
-                        <Text style={[styles.stepNumberText, { color: theme.colors.primary }]}>{index + 1}</Text>
-                      </View>
-                      <Text style={[styles.stepLabel, { color: theme.colors.primary }]}>Step {index + 1}</Text>
-                    </View>
-
-                    <Text style={styles.stepTitle}>{step.title}</Text>
-                    <Text style={styles.stepDesc}>{step.description}</Text>
-                  </Card.Content>
-                </Card>
-
-                <Card style={[styles.previewCard, { backgroundColor: theme.colors.surface }]} elevation={2}>
-                  <Card.Content style={styles.previewContent}>
-                    <Text style={[styles.previewKicker, { color: theme.colors.primary }]}>Preview</Text>
-                    <Text style={styles.previewTitle}>{step.title}</Text>
-                    <Text style={styles.previewDesc}>
-                      Visual walkthrough of the step in your dashboard.
-                    </Text>
-                  </Card.Content>
-                </Card>
-              </Animated.View>
-            );
-          })}
-        </View>
-      </View>
-
-      <Surface style={[styles.footerCTAStrip, { backgroundColor: theme.colors.primary }]} elevation={4}>
-        <Text style={styles.footerTitle}>Ready to get started?</Text>
-        <Text style={styles.footerText}>
-          Tap into trusted professionals across every category. Book in minutes
-          and track every detail with Enjez.
-        </Text>
-
-        <Button
-          mode="outlined"
-          onPress={() => navigation.navigate("Services")}
-          style={styles.ctaExplore}
-          labelStyle={styles.ctaExploreLabel}
-        >
-          Explore Services
-        </Button>
-      </Surface>
-
-      <View style={{ height: 20 }} />
+        <View style={{ height: 20 }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -177,8 +176,9 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 14,
   },
-  heroTop: { flexDirection: "row", alignItems: "center", gap: 12, paddingTop: 8,
-   },
+  heroTop: {
+    flexDirection: "row", alignItems: "center", gap: 12, paddingTop: 8,
+  },
   avatar: { backgroundColor: "#000" },
   heroText: { marginLeft: 12 },
   kicker: { color: "#000", fontSize: 12, letterSpacing: 1, fontWeight: "700" },
@@ -240,5 +240,5 @@ const styles = StyleSheet.create({
   footerText: { color: "#fff", marginTop: 8, textAlign: "center" },
   ctaExplore: { marginTop: 12, borderColor: "#fff", borderWidth: 1, borderRadius: 24 },
   ctaExploreLabel: { color: "#fff", fontWeight: "700" },
-  
+
 });

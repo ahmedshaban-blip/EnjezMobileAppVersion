@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, View, TouchableOpacity } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  Platform,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
@@ -14,6 +22,7 @@ import {
 } from "react-native-paper";
 
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
+import { WebView } from "react-native-webview";
 
 import { getAllDocs, createBooking } from "../../utils/firebaseHelpers.js";
 import { useAuth } from "../../hooks/AuthContext.jsx";
@@ -27,6 +36,9 @@ const COLORS = {
   primary: "#2563eb",
 };
 
+const PAYPAL_CHECKOUT_URL =
+  "https://ahmedshaban-blip.github.io/paypalPageForNativeApp/";
+
 export default function Booking({ navigation, route }) {
   const { id: serviceId } = route.params;
   const { user } = useAuth();
@@ -39,13 +51,17 @@ export default function Booking({ navigation, route }) {
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
 
-  // --- DATE ---
+  // DATE
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [date, setDate] = useState();
 
-  // --- TIME ---
+  // TIME / PROVIDER
   const [openTimePicker, setOpenTimePicker] = useState(false);
   const [time, setTime] = useState("");
+
+  // PAYPAL MODAL
+  const [showPayPal, setShowPayPal] = useState(false);
+  const amount = Number(service?.price || 10);
 
   useEffect(() => {
     const loadData = async () => {
@@ -61,15 +77,18 @@ export default function Booking({ navigation, route }) {
     };
 
     loadData();
-  }, []);
+  }, [serviceId]);
 
-  const handleSubmit = async () => {
-    if (!date || !time || !address || !phone || !selectedAgent) {
-      alert("Please fill all required fields");
-      return;
+  const buildBookingObject = () => {
+    if (!user?.uid) {
+      throw new Error("Please login first");
     }
 
-    const booking = {
+    if (!date || !time || !address || !phone || !selectedAgent) {
+      throw new Error("Please fill all required fields");
+    }
+
+    return {
       userId: user.uid,
       serviceId,
       agentId: selectedAgent,
@@ -80,13 +99,168 @@ export default function Booking({ navigation, route }) {
       notes,
       status: "pending",
     };
+  };
+
+  const createBookingInFirestore = async (extra = {}) => {
+    const booking = {
+      ...buildBookingObject(),
+      ...extra, // paymentMethod, paymentStatus, paypalDetails...
+    };
 
     const id = await createBooking(booking);
-    navigation.navigate("Confirmation", { bookingId: id });
+    return id;
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const id = await createBookingInFirestore({
+        paymentMethod: "offline",
+        paymentStatus: "pending",
+      });
+
+      navigation.navigate("Confirmation", { bookingId: id });
+    } catch (err) {
+      Alert.alert("Error", err.message);
+    }
+  };
+
+  const onPaymentSuccess = async (details) => {
+    try {
+      const id = await createBookingInFirestore({
+        paymentMethod: "paypal",
+        paymentStatus: "paid",
+        paypalDetails: details || null,
+      });
+
+      setShowPayPal(false);
+      Alert.alert("Payment Successful", "Your booking has been confirmed");
+      navigation.navigate("Confirmation", { bookingId: id });
+    } catch (e) {
+      console.log(e);
+      setShowPayPal(false);
+      Alert.alert(
+        "Saved but…",
+        "Payment was successful but booking could not be saved."
+      );
+    }
+  };
+
+  const onPaymentError = (message) => {
+    setShowPayPal(false);
+    Alert.alert("Payment Error", message || "Unknown error");
+  };
+
+  const handlePayPalMessage = (event) => {
+    try {
+      const data = JSON.parse(event?.nativeEvent?.data || "{}");
+
+      if (data.status === "success") {
+        onPaymentSuccess(data.details);
+      } else if (data.status === "error") {
+        onPaymentError(data.message);
+      } else if (data.status === "cancel") {
+        setShowPayPal(false);
+        Alert.alert("Payment Cancelled", "You cancelled the payment.");
+      }
+    } catch (err) {
+      console.log("Error parsing message:", err);
+    }
+  };
+
+  const handleOpenPayPal = () => {
+    try {
+      buildBookingObject();
+      setShowPayPal(true);
+    } catch (err) {
+      Alert.alert("Missing Data", err.message);
+    }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Modal PayPal */}
+      <Portal>
+        <Modal
+          visible={showPayPal}
+          onDismiss={() => setShowPayPal(false)}
+          contentContainerStyle={{ flex: 1, backgroundColor: "#00000055" }}
+        >
+          <View
+            style={{
+              flex: 1,
+              margin: 16,
+              borderRadius: 16,
+              overflow: "hidden",
+            }}
+          >
+   <View
+  style={{
+    paddingHorizontal: 16, 
+    paddingVertical: 14,    
+    backgroundColor: "#fff",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,   
+    borderBottomColor: "#F0F0F0",
+    elevation: 2,           
+    shadowColor: "#000",    
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+  }}
+>
+  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    
+    <Text style={{ 
+        fontSize: 18, 
+        fontWeight: "700", 
+        color: "#1a1a1a" 
+    }}>
+      Pay with PayPal
+    </Text>
+  </View>
+
+  <View style={{ backgroundColor: '#F3F4F6', borderRadius: 20 }}>
+    <IconButton
+      icon="close"
+      size={20}
+      color="#4B5563"
+      onPress={() => setShowPayPal(false)}
+      style={{ margin: 0 }} 
+    />
+  </View>
+</View>
+
+            {Platform.OS === "web" ? (
+              <iframe
+                width="100%"
+                height="100%"
+                src={PAYPAL_CHECKOUT_URL}
+                title="PayPal Checkout"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <WebView
+                style={{ flex: 1 }}
+                source={{
+                  uri: `${PAYPAL_CHECKOUT_URL}?amount=${encodeURIComponent(
+                    amount
+                  )}`,
+                }}
+                onMessage={handlePayPalMessage}
+                javaScriptEnabled
+                domStorageEnabled
+                startInLoadingState
+                thirdPartyCookiesEnabled
+                sharedCookiesEnabled
+              />
+            )}
+          </View>
+        </Modal>
+      </Portal>
+
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
@@ -107,9 +281,10 @@ export default function Booking({ navigation, route }) {
 
           <Text variant="headlineSmall">Book {service?.name} Service</Text>
         </View>
+
         <Card mode="elevated" style={styles.formCard}>
           <Card.Content>
-            {/* PROVIDER */}
+            {/* Provider */}
             <Text style={styles.label}>Provider</Text>
             <TouchableOpacity
               style={styles.selector}
@@ -156,7 +331,7 @@ export default function Booking({ navigation, route }) {
               </Modal>
             </Portal>
 
-            {/* DATE */}
+            {/* Date */}
             <Text style={styles.label}>Requested Date</Text>
             <TouchableOpacity
               style={styles.selector}
@@ -177,7 +352,7 @@ export default function Booking({ navigation, route }) {
               }}
             />
 
-            {/* TIME */}
+            {/* Time */}
             <Text style={styles.label}>Requested Time</Text>
             <TouchableOpacity
               style={styles.selector}
@@ -202,7 +377,7 @@ export default function Booking({ navigation, route }) {
               }}
             />
 
-            {/* ADDRESS */}
+            {/* Address */}
             <TextInput
               mode="outlined"
               label="Address"
@@ -212,7 +387,7 @@ export default function Booking({ navigation, route }) {
               outlineStyle={styles.inputOutline}
             />
 
-            {/* PHONE */}
+            {/* Phone */}
             <TextInput
               mode="outlined"
               label="Phone Number"
@@ -223,7 +398,7 @@ export default function Booking({ navigation, route }) {
               outlineStyle={styles.inputOutline}
             />
 
-            {/* NOTES */}
+            {/* Notes */}
             <TextInput
               mode="outlined"
               label="Notes"
@@ -234,6 +409,7 @@ export default function Booking({ navigation, route }) {
               outlineStyle={styles.inputOutline}
             />
 
+            {/* Confirm booking */}
             <PaperButton
               mode="contained"
               style={styles.button}
@@ -241,6 +417,28 @@ export default function Booking({ navigation, route }) {
             >
               Confirm booking
             </PaperButton>
+
+            {/* PayPal */}
+            <Text
+              style={{
+                textAlign: "center",
+                marginTop: 12,
+                color: COLORS.textMuted,
+              }}
+            >
+              or pay online with
+            </Text>
+
+            <View style={{ marginTop: 8 }}>
+              <PaperButton
+                mode="outlined"
+                style={[styles.button, { backgroundColor: "#fff" }]}
+                textColor={COLORS.primary}
+                onPress={handleOpenPayPal}
+              >
+                Pay with PayPal
+              </PaperButton>
+            </View>
           </Card.Content>
         </Card>
       </ScrollView>
