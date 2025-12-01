@@ -1,9 +1,10 @@
 import React, { useState, useCallback } from "react";
 import { View, FlatList } from "react-native";
-import { Appbar, Searchbar, Chip, Card, Text, Button } from "react-native-paper";
+import { Appbar, Searchbar, Chip, Button } from "react-native-paper";
 import { getDocsByField, getAllDocs } from "../../utils/firebaseHelpers";
 import { useAuth } from "../../hooks/AuthContext";
 import { useFocusEffect } from "@react-navigation/native";
+import BookingItem from "../../components/client/myBooking/BookingItem";
 
 export default function MyBookings({ navigation }) {
   const { user } = useAuth();
@@ -64,13 +65,6 @@ export default function MyBookings({ navigation }) {
 
     return matchSearch && matchFilter;
   });
-
-  const statusColor = {
-    pending: "#FACC15",
-    confirmed: "#3B82F6",
-    completed: "#22C55E",
-    cancelled: "#EF4444",
-  };
 
   const loadMore = () => {
     setVisibleCount((prev) => prev + 5);
@@ -138,45 +132,7 @@ export default function MyBookings({ navigation }) {
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingBottom: 20 }}
           renderItem={({ item }) => (
-            <Card
-              style={{ marginVertical: 8, backgroundColor: "white" }}
-              onPress={() =>
-                navigation.navigate("BookingDetails", { id: item.id })
-              }
-            >
-              <Card.Title
-                title={item.serviceName}
-                subtitle={item.providerName}
-              />
-
-              <Card.Content>
-                <Text style={{ color: "#555", marginBottom: 5 }}>
-                  {item.date} at {item.time}
-                </Text>
-
-                <Chip
-                  style={{
-                    marginTop: 10,
-                    alignSelf: "flex-start",
-                    backgroundColor: statusColor[item.status?.toLowerCase()] || "#ccc",
-                    borderRadius: 8,
-                    height: 32
-                  }}
-                  textStyle={{
-                    color: "white",
-                    fontSize: 12,
-                    lineHeight: 18,
-                    fontWeight: "bold"
-                  }}
-                >
-                  {item.status || "Unknown"}
-                </Chip>
-
-                <Text style={{ marginTop: 12, fontWeight: "bold", fontSize: 16 }}>
-                  ${item.price}
-                </Text>
-              </Card.Content>
-            </Card>
+            <BookingItem item={item} navigation={navigation} />
           )}
         />
 

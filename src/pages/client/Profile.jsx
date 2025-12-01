@@ -2,27 +2,22 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import {
     Text,
-    Avatar,
     Card,
     ActivityIndicator,
     Appbar,
     Divider,
-    useTheme,
     Button,
-    Portal,
-    Dialog,
-    TextInput,
-    HelperText,
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../../hooks/AuthContext";
 import { getDocById } from "../../utils/firebaseHelpers";
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import { auth } from "../../config/firebase";
+import ProfileHeader from "../../components/client/profile/ProfileHeader";
+import ChangePasswordDialog from "../../components/client/profile/ChangePasswordDialog";
 
 export default function Profile({ navigation }) {
     const { user } = useAuth();
-    const theme = useTheme();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [changePasswordVisible, setChangePasswordVisible] = useState(false);
@@ -109,15 +104,7 @@ export default function Profile({ navigation }) {
             </Appbar.Header>
 
             <ScrollView contentContainerStyle={styles.content}>
-                <View style={styles.header}>
-                    <Avatar.Text
-                        size={80}
-                        label={profile.username ? profile.username.substring(0, 2).toUpperCase() : "U"}
-                        style={{ backgroundColor: "#2563eb" }}
-                    />
-                    <Text style={styles.username}>{profile.username || "User"}</Text>
-                    <Text style={styles.email}>{profile.email}</Text>
-                </View>
+                <ProfileHeader profile={profile} />
 
                 <Card style={styles.card}>
                     <Card.Content>
@@ -147,33 +134,17 @@ export default function Profile({ navigation }) {
                     Change Password
                 </Button>
 
-                <Portal>
-                    <Dialog visible={changePasswordVisible} onDismiss={() => setChangePasswordVisible(false)}>
-                        <Dialog.Title>Change Password</Dialog.Title>
-                        <Dialog.Content>
-                            <TextInput
-                                label="Current Password"
-                                value={currentPassword}
-                                onChangeText={setCurrentPassword}
-                                secureTextEntry
-                                mode="outlined"
-                                style={{ marginBottom: 10 }}
-                            />
-                            <TextInput
-                                label="New Password"
-                                value={newPassword}
-                                onChangeText={setNewPassword}
-                                secureTextEntry
-                                mode="outlined"
-                            />
-                            {passwordError ? <HelperText type="error">{passwordError}</HelperText> : null}
-                        </Dialog.Content>
-                        <Dialog.Actions>
-                            <Button onPress={() => setChangePasswordVisible(false)}>Cancel</Button>
-                            <Button onPress={handleChangePassword} loading={passwordLoading} disabled={passwordLoading}>Update</Button>
-                        </Dialog.Actions>
-                    </Dialog>
-                </Portal>
+                <ChangePasswordDialog
+                    visible={changePasswordVisible}
+                    onDismiss={() => setChangePasswordVisible(false)}
+                    currentPassword={currentPassword}
+                    setCurrentPassword={setCurrentPassword}
+                    newPassword={newPassword}
+                    setNewPassword={setNewPassword}
+                    passwordError={passwordError}
+                    handleChangePassword={handleChangePassword}
+                    passwordLoading={passwordLoading}
+                />
             </ScrollView>
         </SafeAreaView>
     );
@@ -196,21 +167,6 @@ const styles = StyleSheet.create({
     },
     content: {
         padding: 20,
-    },
-    header: {
-        alignItems: "center",
-        marginBottom: 30,
-    },
-    username: {
-        fontSize: 24,
-        fontWeight: "bold",
-        marginTop: 10,
-        color: "#1e293b",
-    },
-    email: {
-        fontSize: 16,
-        color: "#64748b",
-        marginTop: 5,
     },
     card: {
         backgroundColor: "white",

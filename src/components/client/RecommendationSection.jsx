@@ -46,10 +46,13 @@ export default function RecommendationSection({ userId }) {
                     .map(([id]) => id);
 
                 const sortedServices = services
-                    .filter((svc) => sortedServiceIds.includes(svc.id))
+                    .filter((svc) => svc && svc.id && sortedServiceIds.includes(svc.id))
                     .sort(
-                        (a, b) =>
-                            sortedServiceIds.indexOf(a.id) - sortedServiceIds.indexOf(b.id)
+                        (a, b) => {
+                            const indexA = sortedServiceIds.indexOf(a.id);
+                            const indexB = sortedServiceIds.indexOf(b.id);
+                            return indexA - indexB;
+                        }
                     );
 
                 const servicesWithCategoryName = sortedServices.map((service) => {
