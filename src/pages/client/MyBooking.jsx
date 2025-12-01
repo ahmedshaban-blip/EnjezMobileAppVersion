@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useCallback } from "react";
 import { View, FlatList } from "react-native";
 import { Appbar, Searchbar, Chip, Card, Text, Button } from "react-native-paper";
 import { getDocsByField, getAllDocs } from "../../utils/firebaseHelpers";
 import { useAuth } from "../../hooks/AuthContext";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function MyBookings({ navigation }) {
   const { user } = useAuth();
@@ -14,31 +15,33 @@ export default function MyBookings({ navigation }) {
   // pagination
   const [visibleCount, setVisibleCount] = useState(5);
 
-  useEffect(() => {
-    if (!user) return;
+  useFocusEffect(
+    useCallback(() => {
+      if (!user) return;
 
-    const load = async () => {
-      const userBookings = await getDocsByField("bookings", "userId", user.uid);
-      const services = await getAllDocs("services");
-      const agents = await getAllDocs("agents");
+      const load = async () => {
+        const userBookings = await getDocsByField("bookings", "userId", user.uid);
+        const services = await getAllDocs("services");
+        const agents = await getAllDocs("agents");
 
-      const enriched = userBookings.map((b) => {
-        const service = services.find((s) => s.id === b.serviceId);
-        const agent = agents.find((a) => a.id === b.agentId);
+        const enriched = userBookings.map((b) => {
+          const service = services.find((s) => s.id === b.serviceId);
+          const agent = agents.find((a) => a.id === b.agentId);
 
-        return {
-          ...b,
-          serviceName: service?.name || "Unknown Service",
-          providerName: agent?.name || "Unknown Provider",
-          price: service?.price || "N/A",
-        };
-      });
+          return {
+            ...b,
+            serviceName: service?.name || "Unknown Service",
+            providerName: agent?.name || "Unknown Provider",
+            price: service?.price || "N/A",
+          };
+        });
 
-      setBookings(enriched);
-    };
+        setBookings(enriched);
+      };
 
-    load();
-  }, [user]);
+      load();
+    }, [user])
+  );
 
   // --- SEARCH LOGIC ---
   const filtered = bookings.filter((b) => {
@@ -51,7 +54,7 @@ export default function MyBookings({ navigation }) {
 
     // 3. Check if search term is included in either field
     const matchSearch =
-      serviceName.includes(searchTerm) || 
+      serviceName.includes(searchTerm) ||
       providerName.includes(searchTerm);
 
     // 4. Filter by Status
@@ -77,6 +80,7 @@ export default function MyBookings({ navigation }) {
     <>
       {/* Top App Bar */}
       <Appbar.Header style={{ backgroundColor: "white" }}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
         <Appbar.Content title="My Bookings" />
         <Appbar.Action
           icon="plus"
@@ -90,11 +94,11 @@ export default function MyBookings({ navigation }) {
           placeholder="Search by service or provider"
           value={search}
           onChangeText={setSearch}
-          style={{ 
-            marginBottom: 12, 
-            backgroundColor: "#edeef0ee", 
+          style={{
+            marginBottom: 12,
+            backgroundColor: "#edeef0ee",
             borderRadius: 10,
-            elevation: 0 
+            elevation: 0
           }}
           placeholderTextColor="#666"
           iconColor="#666"
@@ -102,7 +106,7 @@ export default function MyBookings({ navigation }) {
 
         {/* Filter Chips */}
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-          {["All", "Pending", "Confirmed", "Completed", "Cancelled"].map(
+          {["All", "Pending", "Confirmed", "Completed"].map(
             (s) => {
               const isSelected = filter === s;
               return (
@@ -112,11 +116,11 @@ export default function MyBookings({ navigation }) {
                   onPress={() => setFilter(s)}
                   style={{
                     marginBottom: 8,
-                    backgroundColor: isSelected ? "#3B82F6" : "#edeef0ee", 
+                    backgroundColor: isSelected ? "#3B82F6" : "#edeef0ee",
                     borderColor: "transparent"
                   }}
                   textStyle={{
-                    color: isSelected ? "white" : "#333", 
+                    color: isSelected ? "white" : "#333",
                     fontWeight: isSelected ? "bold" : "normal"
                   }}
                   showSelectedOverlay={true}
@@ -153,13 +157,13 @@ export default function MyBookings({ navigation }) {
                 <Chip
                   style={{
                     marginTop: 10,
-                    alignSelf: "flex-start", 
+                    alignSelf: "flex-start",
                     backgroundColor: statusColor[item.status?.toLowerCase()] || "#ccc",
                     borderRadius: 8,
                     height: 32
                   }}
-                  textStyle={{ 
-                    color: "white", 
+                  textStyle={{
+                    color: "white",
                     fontSize: 12,
                     lineHeight: 18,
                     fontWeight: "bold"

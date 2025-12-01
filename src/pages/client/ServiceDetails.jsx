@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, ScrollView } from "react-native";
+import { View, Image, ScrollView, ActivityIndicator } from "react-native";
 import { Text, IconButton, Button } from "react-native-paper";
 import { getDocById } from "../../utils/firebaseHelpers.js";
-import { useLoading } from "../../context/LoadingContext.jsx";
 import { useNavigation } from "@react-navigation/native";
 
 export default function ServiceDetailsPage({ route }) {
   const { id } = route.params;
   const [service, setService] = useState(null);
 
-  const { showLoading, hideLoading } = useLoading();
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -17,13 +15,17 @@ export default function ServiceDetailsPage({ route }) {
   }, []);
 
   const load = async () => {
-    showLoading("Loading details...");
     const data = await getDocById("services", id);
-    hideLoading();
     setService(data);
   };
 
-  if (!service) return null;
+  if (!service) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#2563eb" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView

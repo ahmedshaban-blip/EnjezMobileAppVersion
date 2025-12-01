@@ -10,6 +10,7 @@ import {
   Avatar,
   Divider,
   useTheme,
+  Appbar,
 } from "react-native-paper";
 
 const { width } = Dimensions.get("window");
@@ -62,15 +63,19 @@ export default function HowItWorks() {
   }, [animValues]);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
+      <Appbar.Header style={{ backgroundColor: "#f8fafc" }}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.Content title="How It Works" />
+      </Appbar.Header>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <Surface style={[styles.hero, { backgroundColor: theme.colors.surface }]}
           elevation={3}
         >
           <View style={styles.heroTop}>
-            <Avatar.Text size={56} label="EN" style={[styles.avatar, { backgroundColor: theme.colors.primary }]} />
+            <Avatar.Text size={56} label="EN" style={[styles.avatar, { backgroundColor: "#2563eb" }]} />
             <View style={styles.heroText}>
-              <Text style={[styles.kicker, { color: theme.colors.primary }]}>THE ENJEZ JOURNEY</Text>
+              <Text style={[styles.kicker, { color: "#2563eb" }]}>THE ENJEZ JOURNEY</Text>
               <Text style={styles.heroTitle}>How Enjez Works</Text>
             </View>
           </View>
@@ -85,6 +90,7 @@ export default function HowItWorks() {
             onPress={() => navigation.navigate("Services")}
             style={styles.cta}
             contentStyle={styles.ctaContent}
+            buttonColor="#2563eb"
           >
             Get Started
           </Button>
@@ -92,7 +98,7 @@ export default function HowItWorks() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionKicker, { color: theme.colors.primary }]}>FROM START TO SERVICE</Text>
+            <Text style={[styles.sectionKicker, { color: "#2563eb" }]}>FROM START TO SERVICE</Text>
             <Text style={styles.sectionTitle}>Your step-by-step path</Text>
             <Text style={styles.sectionLead}>
               Each milestone is designed to keep you informed and confident, no
@@ -119,9 +125,9 @@ export default function HowItWorks() {
                     <Card.Content>
                       <View style={styles.stepHeader}>
                         <View style={styles.stepNumber}>
-                          <Text style={[styles.stepNumberText, { color: theme.colors.primary }]}>{index + 1}</Text>
+                          <Text style={[styles.stepNumberText, { color: "#2563eb" }]}>{index + 1}</Text>
                         </View>
-                        <Text style={[styles.stepLabel, { color: theme.colors.primary }]}>Step {index + 1}</Text>
+                        <Text style={[styles.stepLabel, { color: "#2563eb" }]}>Step {index + 1}</Text>
                       </View>
 
                       <Text style={styles.stepTitle}>{step.title}</Text>
@@ -131,7 +137,7 @@ export default function HowItWorks() {
 
                   <Card style={[styles.previewCard, { backgroundColor: theme.colors.surface }]} elevation={2}>
                     <Card.Content style={styles.previewContent}>
-                      <Text style={[styles.previewKicker, { color: theme.colors.primary }]}>Preview</Text>
+                      <Text style={[styles.previewKicker, { color: "#2563eb" }]}>Preview</Text>
                       <Text style={styles.previewTitle}>{step.title}</Text>
                       <Text style={styles.previewDesc}>
                         Visual walkthrough of the step in your dashboard.
@@ -144,7 +150,7 @@ export default function HowItWorks() {
           </View>
         </View>
 
-        <Surface style={[styles.footerCTAStrip, { backgroundColor: theme.colors.primary }]} elevation={4}>
+        <Surface style={[styles.footerCTAStrip, { backgroundColor: "#2563eb" }]} elevation={4}>
           <Text style={styles.footerTitle}>Ready to get started?</Text>
           <Text style={styles.footerText}>
             Tap into trusted professionals across every category. Book in minutes
@@ -163,12 +169,12 @@ export default function HowItWorks() {
 
         <View style={{ height: 20 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#f8fafc", paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0 },
+  safeArea: { flex: 1, backgroundColor: "#f8fafc" },
   container: { flex: 1, backgroundColor: "transparent" },
   content: { padding: 16, paddingBottom: 32 },
   hero: {

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { View, ScrollView, StyleSheet, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { Text, TextInput } from "react-native-paper";
+import { Text, TextInput, Appbar } from "react-native-paper";
 import { Linking } from "react-native";
 import Button from "../../components/ui/Button";
 
@@ -80,6 +80,10 @@ export default function Contact({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="dark" />
+      <Appbar.Header style={{ backgroundColor: COLORS.pageBg }}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.Content title="Contact Us" />
+      </Appbar.Header>
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}

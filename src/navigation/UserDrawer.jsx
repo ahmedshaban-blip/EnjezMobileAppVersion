@@ -19,6 +19,7 @@ import HowItWorks from "../pages/client/HowItWorks";
 
 import About from "../pages/client/About";
 import Contact from "../pages/client/Contact";
+import Profile from "../pages/client/Profile";
 
 const Drawer = createDrawerNavigator();
 
@@ -75,15 +76,24 @@ function CustomDrawerContent(props) {
             active={currentRouteName === item.screen}
             onPress={() => navigation.navigate(item.screen)}
             theme={{
-              colors: {secondaryContainer: '#2d6ff3ff', onSecondaryContainer: '#111318' },
+              colors: { secondaryContainer: '#2d6ff3ff', onSecondaryContainer: '#111318' },
             }}
           />
         ))}
       </PaperDrawer.Section>
 
       {/* Logout */}
-      <PaperDrawer.Section style={styles.drawerFooter}>
+      <PaperDrawer.Section style={styles.drawerFooter}><PaperDrawer.Item
+          label="Profile"
+          icon="account-outline"
+          onPress={() => navigation.navigate("Profile")}
+          active={currentRouteName === "Profile"}
+          theme={{
+            colors: { secondaryContainer: '#2d6ff3ff', onSecondaryContainer: '#111318' },
+          }}
+        />
         <PaperDrawer.Item label="Logout" icon="logout" onPress={handleLogout} />
+        
       </PaperDrawer.Section>
     </DrawerContentScrollView>
   );
@@ -107,6 +117,7 @@ export default function UserDrawer() {
       <Drawer.Screen name="Services" component={Services} />
       <Drawer.Screen name="MyBookings" component={MyBookings} />
       <Drawer.Screen name="HowItWorks" component={HowItWorks} />
+      <Drawer.Screen name="Profile" component={Profile} />
       <Drawer.Screen name="About" component={About} />
       <Drawer.Screen name="Contact" component={Contact} />
     </Drawer.Navigator>

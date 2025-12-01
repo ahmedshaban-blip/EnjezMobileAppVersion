@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { Text } from "react-native-paper";
+import { Text, Appbar } from "react-native-paper";
 import LogoHeader from "../../components/common/LogoHeader";
 import Button from "../../components/ui/Button";
 
@@ -58,6 +58,10 @@ export default function About({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
+      <Appbar.Header style={{ backgroundColor: COLORS.pageBg }}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.Content title="About Us" />
+      </Appbar.Header>
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}

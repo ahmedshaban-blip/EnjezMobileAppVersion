@@ -17,13 +17,15 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
   const handleLogin = async () => {
     setError("");
+    setLoading(true);
 
     try {
-      
+
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
@@ -31,7 +33,7 @@ export default function Login() {
       );
       const user = userCredential.user;
 
-      
+
       const userDoc = await getDoc(doc(db, "users", user.uid));
 
       if (userDoc.exists()) {
@@ -39,7 +41,7 @@ export default function Login() {
         const userRole = userData.role;
 
         if (userRole === "admin") {
-          navigation.navigate("Admin"); 
+          navigation.navigate("Admin");
         } else if (userRole === "user") {
           navigation.navigate("Home");
         } else {
@@ -50,6 +52,8 @@ export default function Login() {
       }
     } catch (error) {
       setError("Error signing in: " + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,7 +91,13 @@ export default function Login() {
             </View>
           </View>
 
-          <Button full onPress={handleLogin} style={styles.btn}>
+          <Button
+            full
+            onPress={handleLogin}
+            style={styles.btn}
+            loading={loading}
+            disabled={loading}
+          >
             Sign in
           </Button>
 
@@ -113,10 +123,10 @@ export default function Login() {
 const styles = StyleSheet.create({
   content: {
     marginTop: 8,
-    gap: 20, 
+    gap: 20,
   },
   fields: {
-    gap: 12, 
+    gap: 12,
   },
   forgotRow: {
     flexDirection: "row",
@@ -125,7 +135,7 @@ const styles = StyleSheet.create({
   },
   forgotText: {
     fontSize: 13,
-    color: "#4b5563", 
+    color: "#4b5563",
   },
   footer: {
     alignItems: "center",
@@ -139,7 +149,7 @@ const styles = StyleSheet.create({
   footerLink: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#111827", 
+    color: "#111827",
   },
   errorText: {
     marginTop: 8,
@@ -147,7 +157,7 @@ const styles = StyleSheet.create({
     color: "#ef4444",
     textAlign: "center",
   },
-  btn: { 
-    backgroundColor: "#2563eb", 
+  btn: {
+    backgroundColor: "#2563eb",
   },
 });

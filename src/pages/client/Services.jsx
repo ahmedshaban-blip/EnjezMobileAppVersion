@@ -5,77 +5,134 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { TextInput, Text, IconButton } from "react-native-paper";
-import { getAllDocs, getDocsByField } from "../../utils/firebaseHelpers.js";
+import { getAllDocs, getPaginatedDocs } from "../../utils/firebaseHelpers.js";
 import { useLoading } from "../../context/LoadingContext.jsx";
 import ServiceCard from "../../components/common/ServiceCard.jsx";
+import RecommendationSection from "../../components/client/RecommendationSection.jsx";
+import { useAuth } from "../../hooks/AuthContext.jsx";
 import { useNavigation } from "@react-navigation/native";
 
 export default function ServicesPage() {
-  const [allServices, setAllServices] = useState([]);
-  const [filteredServices, setFilteredServices] = useState([]); // after search + category
-  const [visibleServices, setVisibleServices] = useState([]);
-
+  const { user } = useAuth();
+  const [services, setServices] = useState([]);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
-
   const [search, setSearch] = useState("");
 
+  // Pagination state
+  const [lastDoc, setLastDoc] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [loading, setLoading] = useState(true); // Initial loading state
+
   const ITEMS_PER_PAGE = 6;
-  const { showLoading, hideLoading } = useLoading();
   const navigation = useNavigation();
 
   useEffect(() => {
-    loadInitialData();
+    loadCategories();
   }, []);
 
-  const loadInitialData = async () => {
-    showLoading("Loading...");
-
-    const services = await getAllDocs("services");
-    const cats = await getAllDocs("categories");
-
-    hideLoading();
-
-    setAllServices(services);
-    setFilteredServices(services);
-    setVisibleServices(services.slice(0, ITEMS_PER_PAGE));
-    setCategories(cats); // [{id,name}]
-  };
-
-  // ------------------------------------------
-  // Instant Search (every keystroke)
-  // ------------------------------------------
   useEffect(() => {
-    applyFilters(search, activeCategory);
-  }, [search, activeCategory]);
-
-  const applyFilters = (searchText, categoryId) => {
-    let filtered = allServices;
-
-    // filter by category
-    if (categoryId) {
-      filtered = filtered.filter((s) => s.categoryId === categoryId);
+    if (search.trim()) {
+      handleSearch();
+    } else {
+      loadServices(true);
     }
+  }, [activeCategory, search]);
 
-    // search filter
-    if (searchText.trim()) {
-      filtered = filtered.filter((s) =>
-        s.name.toLowerCase().includes(searchText.toLowerCase())
-      );
-    }
-
-    setFilteredServices(filtered);
-    setVisibleServices(filtered.slice(0, ITEMS_PER_PAGE));
+  const loadCategories = async () => {
+    const cats = await getAllDocs("categories");
+    setCategories(cats);
   };
 
-  // ------------------------------------------
-  // Pagination
-  // ------------------------------------------
-  const loadMore = () => {
-    const next = visibleServices.length + ITEMS_PER_PAGE;
-    setVisibleServices(filteredServices.slice(0, next));
+  const loadServices = async (reset = false) => {
+    if (reset) {
+      setLoading(true);
+      setHasMore(true);
+      setLastDoc(null);
+    } else {
+      if (!hasMore || loadingMore) return;
+      setLoadingMore(true);
+    }
+
+    try {
+      const conditions = [];
+      if (activeCategory) {
+        conditions.push({ field: "categoryId", value: activeCategory });
+      }
+
+      const currentLastDoc = reset ? null : lastDoc;
+      const { docs, lastVisible } = await getPaginatedDocs(
+        "services",
+        ITEMS_PER_PAGE,
+        currentLastDoc,
+        conditions
+      );
+
+      if (reset) {
+        setServices(docs);
+        setLoading(false);
+      } else {
+        setServices((prev) => {
+          const newDocs = docs.filter(
+            (newDoc) => !prev.some((prevDoc) => prevDoc.id === newDoc.id)
+          );
+          return [...prev, ...newDocs];
+        });
+        setLoadingMore(false);
+      }
+
+      setLastDoc(lastVisible);
+      if (docs.length < ITEMS_PER_PAGE) {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error(error);
+      if (reset) setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const handleSearch = async () => {
+    try {
+      const all = await getAllDocs("services");
+      let filtered = all;
+
+      if (activeCategory) {
+        filtered = filtered.filter((s) => s.categoryId === activeCategory);
+      }
+
+      if (search.trim()) {
+        filtered = filtered.filter((s) =>
+          s.name.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+
+      setServices(filtered);
+      setHasMore(false);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+
+  const onEndReached = () => {
+    if (!search.trim()) {
+      loadServices(false);
+    }
+  };
+
+  const renderFooter = () => {
+    if (!loadingMore) return null;
+    return (
+      <View style={{ paddingVertical: 20, alignItems: 'center' }}>
+        <ActivityIndicator size="small" color="#2563eb" />
+      </View>
+    );
   };
 
   // ------------------------------------------
@@ -105,6 +162,9 @@ export default function ServicesPage() {
         placeholder="Search service..."
         style={{ marginBottom: 15, backgroundColor: "#edf1f8ff" }}
       />
+
+      {/* Recommendation Section */}
+      {user && <RecommendationSection userId={user.uid} />}
 
       {/* Categories Row Scroll */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -146,22 +206,29 @@ export default function ServicesPage() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <FlatList
-        data={visibleServices}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <ServiceCard
-            service={item}
-            onPress={() =>
-              navigation.navigate("ServiceDetails", { id: item.id })
-            }
-          />
-        )}
-        ListHeaderComponent={renderHeader}
-        onEndReached={loadMore}
-        onEndReachedThreshold={0.4}
-        showsVerticalScrollIndicator={false}
-      />
+      {loading && !services.length ? (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <ActivityIndicator size="large" color="#2563eb" />
+        </View>
+      ) : (
+        <FlatList
+          data={services}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <ServiceCard
+              service={item}
+              onPress={() =>
+                navigation.navigate("ServiceDetails", { id: item.id })
+              }
+            />
+          )}
+          ListHeaderComponent={renderHeader}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.4}
+          ListFooterComponent={renderFooter}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </SafeAreaView>
   );
 }

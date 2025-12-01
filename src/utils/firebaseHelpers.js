@@ -11,6 +11,9 @@ import {
   updateDoc,
   deleteDoc,
   Timestamp,
+  limit,
+  startAfter,
+  orderBy,
 } from "firebase/firestore";
 
 /**
@@ -163,3 +166,59 @@ export const createBooking = async (booking) => {
   }
 };
 
+/**
+ * Get paginated documents
+ */
+export const getPaginatedDocs = async (collectionName, pageSize, lastDoc = null, conditions = []) => {
+  try {
+    let constraints = [];
+
+    if (conditions && conditions.length > 0) {
+      conditions.forEach((cond) => {
+        constraints.push(where(cond.field, cond.operator || "==", cond.value));
+      });
+    }
+
+    constraints.push(limit(pageSize));
+
+    if (lastDoc) {
+      constraints.push(startAfter(lastDoc));
+    }
+
+    const q = query(collection(db, collectionName), ...constraints);
+    const querySnapshot = await getDocs(q);
+
+    const docs = [];
+    let lastVisible = null;
+
+    if (!querySnapshot.empty) {
+      lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+      querySnapshot.forEach((doc) => {
+        docs.push({ id: doc.id, ...doc.data() });
+      });
+    }
+
+    return { docs, lastVisible };
+  } catch (error) {
+    console.error("Error fetching paginated docs:", error);
+    return { docs: [], lastVisible: null };
+  }
+};
+
+/**
+ * Get all bookings for a specific user
+ */
+export const getUserBookings = async (userId) => {
+  try {
+    const q = query(collection(db, "bookings"), where("userId", "==", userId));
+    const querySnapshot = await getDocs(q);
+    const docs = [];
+    querySnapshot.forEach((doc) => {
+      docs.push({ id: doc.id, ...doc.data() });
+    });
+    return docs;
+  } catch (error) {
+    console.error("Error fetching user bookings:", error);
+    return [];
+  }
+};

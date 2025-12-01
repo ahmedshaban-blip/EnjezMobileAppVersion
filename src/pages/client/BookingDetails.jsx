@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { View, ScrollView } from "react-native";
-import { Appbar, Card, Text, Chip, Button, Divider } from "react-native-paper";
+import { Appbar, Card, Text, Chip, Button, Divider, Portal, Dialog, Paragraph } from "react-native-paper";
 import { useRoute, useNavigation } from "@react-navigation/native";
-import { getDocById } from "../../utils/firebaseHelpers";
+import { getDocById, deleteDocument } from "../../utils/firebaseHelpers";
 
 export default function BookingDetails() {
   const route = useRoute();
@@ -12,6 +12,11 @@ export default function BookingDetails() {
   const [booking, setBooking] = useState(null);
   const [service, setService] = useState(null);
   const [agent, setAgent] = useState(null);
+
+  // Dialog states
+  const [confirmVisible, setConfirmVisible] = useState(false);
+  const [successVisible, setSuccessVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -23,6 +28,22 @@ export default function BookingDetails() {
     };
     load();
   }, [id]);
+
+  const handleDelete = async () => {
+    setLoading(true);
+    const success = await deleteDocument("bookings", id);
+    setLoading(false);
+    setConfirmVisible(false);
+
+    if (success) {
+      setSuccessVisible(true);
+    }
+  };
+
+  const handleSuccessDismiss = () => {
+    setSuccessVisible(false);
+    navigation.goBack();
+  };
 
   if (!booking) return null;
 
@@ -48,7 +69,7 @@ export default function BookingDetails() {
       </Appbar.Header>
 
       <ScrollView style={{ padding: 16 }}>
-        
+
         {/* Title */}
         <Text variant="headlineMedium" style={{ fontWeight: "bold" }}>
           {service?.name || "Loading..."}
@@ -91,24 +112,43 @@ export default function BookingDetails() {
           </Card.Content>
         </Card>
 
-        {/* Action Buttons */}
-        <Button 
-            mode="contained" 
-            style={{ marginTop: 20 }}
-            buttonColor="#3B82F6" 
-        >
-          Reschedule
-        </Button>
-        
-        <Button 
-            mode="outlined" 
-            style={{ marginTop: 10, borderColor: "#3B82F6" }}
-            textColor="#3B82F6" 
+        <Button
+          mode="outlined"
+          style={{ marginTop: 10, borderColor: "#3B82F6" }}
+          textColor="#3B82F6"
+          onPress={() => setConfirmVisible(true)}
         >
           Cancel Request
         </Button>
 
       </ScrollView>
+
+      {/* Confirmation Dialog */}
+      <Portal>
+        <Dialog visible={confirmVisible} onDismiss={() => setConfirmVisible(false)}>
+          <Dialog.Title>Cancel Booking</Dialog.Title>
+          <Dialog.Content>
+            <Paragraph>Are you sure you want to cancel this booking? This action cannot be undone.</Paragraph>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setConfirmVisible(false)}>No</Button>
+            <Button onPress={handleDelete} loading={loading} disabled={loading}>Yes, Cancel</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+
+      {/* Success Dialog */}
+      <Portal>
+        <Dialog visible={successVisible} onDismiss={handleSuccessDismiss}>
+          <Dialog.Title>Success</Dialog.Title>
+          <Dialog.Content>
+            <Paragraph>Your booking has been cancelled successfully.</Paragraph>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={handleSuccessDismiss}>OK</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </>
   );
 }
