@@ -173,9 +173,11 @@ export const getPaginatedDocs = async (collectionName, pageSize, lastDoc = null,
   try {
     let constraints = [];
 
-    if (conditions && conditions.length > 0) {
+    if (conditions && Array.isArray(conditions) && conditions.length > 0) {
       conditions.forEach((cond) => {
-        constraints.push(where(cond.field, cond.operator || "==", cond.value));
+        if (cond.field && cond.operator && cond.value !== undefined) {
+          constraints.push(where(cond.field, cond.operator, cond.value));
+        }
       });
     }
 
