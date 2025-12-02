@@ -17,18 +17,12 @@ Enjez is a cross-platform mobile application built with React Native and Expo, d
 ## 📱 App Screenshots
 
 <div align="center">
- <div align="center">
-  <img src="./screenshots/home-screen.png" alt="Home Screen" width="200"/>
-  <img src="./screenshots/service-details.png" alt="Service Details" width="200"/>
-  <br/>
-  <b>Home Screen</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>Service Details</b>
-  <br/><br/>
-  <img src="./screenshots/booking-process.png" alt="Booking" width="200"/>
-  <img src="./screenshots/my-bookings.png" alt="My Bookings" width="200"/>
-  <br/>
-  <b>Booking Process</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>My Bookings</b>
-</div>
-
+<p align="center">
+  <img src="assets/Screenshots/1.png" alt="Screen" width="350"/>
+  <img src="assets/Screenshots/2.png" alt="Screen" width="350"/>
+  <img src="assets/Screenshots/3.png" alt="Screen" width="350"/>
+  <img src="assets/Screenshots/4.png" alt="Screen" width="350"/>
+</p>
 </div>
 
 ## ✨ Key Features
@@ -44,6 +38,23 @@ Enjez is a cross-platform mobile application built with React Native and Expo, d
 - **Cancel Bookings**: Easy cancellation of service requests
 - **Profile Management**: View profile information and change password with re-authentication
 
+## 👥 Team Members
+
+<div align="center">
+
+| **Ahmed Shaban** | **Jovany Wahba** | **Youshia Zakaria** |
+|:---:|:---:|:---:|
+| 📧 [ahmed.shabaan.dev@gmail.com](mailto:ahmed.shabaan.dev@gmail.com) | 📧 [Jovywahba@gmail.com](mailto:Jovywahba@gmail.com) | 📧 [youshiaz@gmail.com](mailto:youshiaz@gmail.com) |
+| Team Leader & Front-end & Cross-Platform Developer | Front-end & Mobile Developer | Front-end & Mobile Developer |
+| [![GitHub](https://img.shields.io/badge/GitHub-ahmedshaban--blip-black?style=flat&logo=github)](https://github.com/ahmedshaban-blip) | [![GitHub](https://img.shields.io/badge/GitHub-jovywahba-black?style=flat&logo=github)](https://github.com/jovywahba) | [![GitHub](https://img.shields.io/badge/GitHub-YouShiaZ-black?style=flat&logo=github)](https://github.com/YouShiaZ) |
+
+| **Tassnem Abd Elrazik** | **Maram Ahmed** | **Doha Abo Elkassem** |
+|:---:|:---:|:---:|
+| 📧 [tasneem.ar.work@gmail.com](mailto:tasneem.ar.work@gmail.com) | 📧 [maramahmed1818@gmail.com](mailto:maramahmed1818@gmail.com) | 📧 [Kassemhossam878@gmail.com](mailto:Kassemhossam878@gmail.com) |
+| Front-end & Mobile Developer | Front-end & Mobile Developer | Front-end & Mobile Developer |
+| [![GitHub](https://img.shields.io/badge/GitHub-tasneem--abdelrazek-black?style=flat&logo=github)](https://github.com/tasneem-abdelrazek) | [![GitHub](https://img.shields.io/badge/GitHub-MaramAhmed18-black?style=flat&logo=github)](https://github.com/MaramAhmed18) | [![GitHub](https://img.shields.io/badge/GitHub-Doha--AboElkasem-black?style=flat&logo=github)](https://github.com/Doha-AboElkasem) |
+
+</div>
 
 ## 🛠️ Tech Stack
 
@@ -176,12 +187,12 @@ This project is open source and available for educational purposes.
 
 ## 📧 Contact
 
-Ahmed Shaban - [@ahmedshaban-blip](https://github.com/ahmedshaban-blip)
+For any inquiries or support, feel free to reach out to any team member above.
 
 Project Link: [https://github.com/ahmedshaban-blip/EnjezMobileAppVersion](https://github.com/ahmedshaban-blip/EnjezMobileAppVersion)
 
 ---
 
 <div align="center">
-  Made with ❤️ by Ahmed Shaban
+  Made with ❤️ by Enjez Team
 </div>
