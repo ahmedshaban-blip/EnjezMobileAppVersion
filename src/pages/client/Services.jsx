@@ -35,6 +35,7 @@ export default function ServicesPage({ route }) {
   }, [route?.params?.searchQuery]);
 
   useEffect(() => {
+    console.log("Active category changed:", activeCategory);
     if (search.trim()) {
       handleSearch();
     } else {
@@ -60,15 +61,22 @@ export default function ServicesPage({ route }) {
     try {
       const conditions = [];
       if (activeCategory) {
-        conditions.push({ field: "categoryId", value: activeCategory });
+        conditions.push({
+          field: "categoryId",
+          operator: "==",
+          value: activeCategory,
+        });
       }
+      console.log("Loading services with conditions:", conditions);
 
       const currentLastDoc = reset ? null : lastDoc;
       const { docs, lastVisible } = await getPaginatedDocs(
         "services",
         ITEMS_PER_PAGE,
         currentLastDoc,
-        conditions
+        conditions,
+        "createdAt",
+        "desc"
       );
 
       if (reset) {

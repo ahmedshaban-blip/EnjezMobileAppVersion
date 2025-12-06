@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
-import "react-native-reanimated";
-
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigationContainerRef } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Provider as PaperProvider } from "react-native-paper";
+import { Provider as PaperProvider, Portal } from "react-native-paper";
+import React, { useState } from "react";
 
 import Login from "./src/pages/auth/Login";
 import Signup from "./src/pages/auth/Signup";
@@ -20,6 +18,7 @@ import ServiceDetailsPage from "./src/pages/client/ServiceDetails";
 import Booking from "./src/pages/client/Booking";
 import Confirmation from "./src/pages/client/Confirmation";
 import SplashScreen from "./src/components/SplashScreen";
+import Chatbot from "./src/components/common/Chatbot";
 
 const Stack = createNativeStackNavigator();
 
@@ -50,6 +49,8 @@ function RootNavigator() {
 function Main() {
   const { authLoading } = useAuth();
   const [isSplashAnimationFinished, setIsSplashAnimationFinished] = useState(false);
+  const navigationRef = useNavigationContainerRef();
+  const [currentRoute, setCurrentRoute] = useState(null);
 
   // Show splash screen if auth is loading OR animation hasn't finished
   if (authLoading || !isSplashAnimationFinished) {
@@ -60,9 +61,23 @@ function Main() {
     );
   }
 
+  const authScreens = ["Login", "Signup"];
+
   return (
-    <NavigationContainer>
-      <RootNavigator />
+    <NavigationContainer
+      ref={navigationRef}
+      onReady={() => {
+        setCurrentRoute(navigationRef.getCurrentRoute()?.name);
+      }}
+      onStateChange={async () => {
+        const currentRouteName = navigationRef.getCurrentRoute()?.name;
+        setCurrentRoute(currentRouteName);
+      }}
+    >
+      <Portal.Host style={{ flex: 1 }}>
+        <RootNavigator />
+        {!authScreens.includes(currentRoute) && <Chatbot />}
+      </Portal.Host>
     </NavigationContainer>
   );
 }
