@@ -169,16 +169,27 @@ export const createBooking = async (booking) => {
 /**
  * Get paginated documents
  */
-export const getPaginatedDocs = async (collectionName, pageSize, lastDoc = null, conditions = []) => {
+export const getPaginatedDocs = async (
+  collectionName,
+  pageSize,
+  lastDoc = null,
+  conditions = [],
+  orderByField = "createdAt",
+  orderByDirection = "desc"
+) => {
   try {
     let constraints = [];
 
     if (conditions && Array.isArray(conditions) && conditions.length > 0) {
       conditions.forEach((cond) => {
-        if (cond.field && cond.operator && cond.value !== undefined) {
-          constraints.push(where(cond.field, cond.operator, cond.value));
+        if (cond.field && cond.value !== undefined) {
+          constraints.push(where(cond.field, cond.operator || "==", cond.value));
         }
       });
+    }
+    
+    if (orderByField) {
+      constraints.push(orderBy(orderByField, orderByDirection));
     }
 
     constraints.push(limit(pageSize));
